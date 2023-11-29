@@ -12,6 +12,7 @@
   <link rel="icon" href="https://i.ibb.co/qdF6FS8/cewekmurahan.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-autovideo@1/autovideo.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 
@@ -116,8 +117,42 @@
   <div class="container mt-4">
     <div id="videos" class="row"></div>
     <div id="notification" class="notification">Video not found!</div>
+
+    <div class="fixed-bottom bg-dark text-white p-2">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="input-group mb-3">
+              <input type="text" id="urlInput" class="form-control bg-dark text-white" value="" readonly>
+              <div class="input-group-append">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share mx-3 mt-2" viewBox="0 0 16 16" onclick="copyURL()">
+                  <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+      document.getElementById('urlInput').value = window.location.href;
+
+      function copyURL() {
+        var copyText = document.getElementById('urlInput');
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Copied!',
+          text: 'URL successfully copied: ' + copyText.value,
+        });
+      }
+
       function getRandomColor() {
         const letters = '0123456789ABCDEF';
         let color = '#';
