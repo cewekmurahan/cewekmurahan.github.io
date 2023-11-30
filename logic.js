@@ -470,7 +470,7 @@ var iframe = document.createElement("iframe");
 iframe.id = "statcounterIframe";
 iframe.frameBorder = "0";
 iframe.src = "";
-iframe.className = "d-none";
+//iframe.className = "d-none";
 
 document.body.appendChild(iframe);
 document.getElementById('statcounterIframe').src = statcounterCustom;
