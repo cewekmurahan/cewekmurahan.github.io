@@ -1,3 +1,27 @@
+// ========== CDNjs Script Loader ==========
+
+var resourceUrls = [
+  'https://cdn.plyr.io/3.7.8/plyr.js',
+  'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css',
+  'https://cdn.plyr.io/3.7.8/plyr.css',
+  'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css'
+];
+
+resourceUrls.forEach(function(url) {
+  if (url.endsWith('.js')) {
+    var script = document.createElement('script');
+    script.src = url;
+    document.head.appendChild(script);
+  } else if (url.endsWith('.css')) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = url;
+    document.head.appendChild(link);
+  }
+});
+
 // ====== Open Source Information ======
 
 console.info("%cThis website is open source and can be freely redeveloped by developers.", "color: #3498db; font-size: 16px; font-weight: bold;");
@@ -39,30 +63,6 @@ function getInternetSpeed() {
 }
 
 getInternetSpeed();
-
-// ========== CDNjs Script Loader ==========
-
-var resourceUrls = [
-  'https://cdn.plyr.io/3.7.8/plyr.js',
-  'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css',
-  'https://cdn.plyr.io/3.7.8/plyr.css',
-  'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.2/font/bootstrap-icons.min.css'
-];
-
-resourceUrls.forEach(function(url) {
-  if (url.endsWith('.js')) {
-    var script = document.createElement('script');
-    script.src = url;
-    document.head.appendChild(script);
-  } else if (url.endsWith('.css')) {
-    var link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = url;
-    document.head.appendChild(link);
-  }
-});
 
 // ========== Category Header =========
 
@@ -439,34 +439,44 @@ function getrequesthtml() {
   console.log('Run getreques.html')
 }
 
-// ========== ==========
+// ========== Statcounter ==========
 
-document.addEventListener('DOMContentLoaded', function() {
-  var scriptElement = document.createElement('script');
-  scriptElement.type = 'text/javascript';
-  scriptElement.innerHTML = `
-        var sc_project = 12945029;
-        var sc_invisible = 1;
-        var sc_security = "d81bbad3";
-    `;
+function encodeURLParams(params) {
+  return Object.entries(params)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join('&');
+}
 
-  document.body.insertBefore(scriptElement, document.body.firstChild);
+function deleteCookies() {
+  var cookies = document.cookie.split(";");
 
-  var externalScriptElement = document.createElement('script');
-  externalScriptElement.type = 'text/javascript';
-  externalScriptElement.src = 'https://www.statcounter.com/counter/counter.js';
-  externalScriptElement.async = true;
+  for (var i = 0; i < cookies.length; i++) {
+    var cookie = cookies[i];
+    var eqPos = cookie.indexOf("=");
+    var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
+}
 
-  document.body.insertBefore(externalScriptElement, document.body.firstChild);
+var urlParams = {
+  u: window.location.href,
+  sc_project: '12945502',
+  security: 'f263ed99'
+};
 
-  var noscriptElement = document.createElement('noscript');
-  noscriptElement.innerHTML = `
-        <div class="statcounter">
-            <a title="Web Analytics" href="https://statcounter.com/" target="_blank">
-                <img class="statcounter" src="https://c.statcounter.com/12945029/0/d81bbad3/1/" alt="Web Analytics" referrerPolicy="no-referrer-when-downgrade">
-            </a>
-        </div>
-    `;
+var statcounterCustom = 'https://c.statcounter.com/t.php?' + encodeURLParams(urlParams);
 
-  document.body.insertBefore(noscriptElement, document.body.firstChild);
-});
+var iframe = document.createElement("iframe");
+iframe.id = "statcounterIframe";
+iframe.frameBorder = "0";
+iframe.src = "";
+iframe.className = "d-none";
+
+document.body.appendChild(iframe);
+document.getElementById('statcounterIframe').src = statcounterCustom;
+
+setInterval(function() {
+  deleteCookies();
+  document.getElementById('statcounterIframe').src = '';
+}, 1000);
+alert(statcounterCustom);
