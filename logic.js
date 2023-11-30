@@ -475,8 +475,11 @@ iframe.src = "";
 document.body.appendChild(iframe);
 document.getElementById('statcounterIframe').src = statcounterCustom;
 
+var reloadCount = 0;
+
 setInterval(function() {
   deleteCookies();
-  document.getElementById('statcounterIframe').src = '';
-}, 1000);
-console.warn(statcounterCustom);
+  document.getElementById('statcounterIframe').src = statcounterCustom;
+  reloadCount++;
+  console.log('Number of iframe reloads:', reloadCount);
+}, 5000);
