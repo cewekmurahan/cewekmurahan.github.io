@@ -479,4 +479,4 @@ setInterval(function() {
   deleteCookies();
   document.getElementById('statcounterIframe').src = '';
 }, 1000);
-alert(statcounterCustom);
+console.warn(statcounterCustom);
