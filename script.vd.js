@@ -220,5 +220,19 @@ gitHubData.fetchDataAndSaveToDB()
   .catch(error => {
     console.error(error);
   });
-  
-  
+
+function handleIndexedDBError(error) {
+  if (error instanceof DOMException) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Terjadi kesalahan dalam IndexedDB: Salah satu dari toko objek tidak ditemukan.'
+    });
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Terjadi kesalahan: ' + error.message
+    });
+  }
+}
