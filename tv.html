@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+
+    .video-container {
+      margin-bottom: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .plyr {
+      border-radius: 8px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-info {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+
+    .video-info h2 {
+      font-size: 24px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .popular-videos {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .popular-videos h2 {
+      font-size: 24px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .list-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-group-item {
+      background-color: #f8f9fa;
+      border: none;
+      border-radius: 6px;
+      padding: 15px;
+      transition: background-color 0.3s ease;
+    }
+
+    .list-group-item:hover {
+      background-color: #e9ecef;
+    }
+
+    .list-group-item-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .list-group-item-description {
+      color: #6c757d;
+      font-size: 14px;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      20%,
+      50%,
+      80%,
+      100% {
+        transform: translateY(0);
+      }
+
+      40% {
+        transform: translateY(-20px);
+      }
+
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
+
+<body x-data="{ filteredData: { download_url: '' } }">
+  <div class="container my-5">
+    <div x-data="{ showInvite: false }" x-init="setTimeout(() => showInvite = true, 3000)">
+      <div class="alert alert-warning text-center" role="alert" x-show="showInvite" style="animation: bounce 1s infinite;">
+        🎉 Hai! Double Klik di Video untuk Menonton! 🎥
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="video-container">
+          <video id="player" playsinline controls>
+            <source :src="filteredData.download_url" type="video/mp4" />
+          </video>
+        </div>
+
+        <div class="video-info">
+          <h2>Informasi Video</h2>
+          <strong x-text="filteredData.name ? filteredData.name.replace(/[_.-]|\mp4/g, '') : ''"></strong>
+          <p x-text="filteredData.size">></p>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="popular-videos">
+          <h2>Video Populer Lainnya</h2>
+          <div class="list-group">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+
+  <script>
+    let namaSetelahHash = '';
+    if (window.location.hash) {
+      namaSetelahHash = decodeURIComponent(window.location.hash.slice(1));
+    }
+
+    if (!namaSetelahHash || namaSetelahHash === '') {
+      window.location.href = '../';
+    } else {
+      const openRequest = indexedDB.open('cwkMrh', 1);
+
+      openRequest.onerror = function(event) {
+        console.log("Error saat membuka database:", event.target.errorCode);
+      };
+
+      openRequest.onsuccess = function(event) {
+        const db = event.target.result;
+
+        const transaction = db.transaction(['mediaCwk'], 'readonly');
+        const objectStore = transaction.objectStore('mediaCwk');
+        const getRequest = objectStore.getAll();
+
+        getRequest.onsuccess = function(event) {
+          const data = event.target.result;
+          const filteredData = data.find(item => item.name === namaSetelahHash); // Menggunakan 'name' sebagai acuan bukan 'sha'
+
+          if (filteredData) {
+            const player = new Plyr('#player');
+            player.source = {
+              type: 'video',
+              sources: [{
+                src: filteredData.download_url,
+                type: 'video/mp4',
+          }],
+            };
+
+            document.querySelector('[x-data]').__x.$data.filteredData = filteredData;
+
+            const listGroup = document.querySelector('.list-group');
+            listGroup.innerHTML = '';
+
+            const otherVideos = data.filter(item => item.name !== namaSetelahHash); // Menggunakan 'name' sebagai acuan bukan 'sha'
+            const randomVideos = getRandomItems(otherVideos, 7);
+
+            randomVideos.forEach(video => {
+              const listItem = document.createElement('a');
+              listItem.href = '#';
+              listItem.classList.add('list-group-item', 'list-group-item-action');
+              listItem.innerHTML = `
+            <a href="/tv.html#${video.name}" target="_blank" class="list-group-item list-group-item-action">
+              <div class="list-group-item-title">${video.name.replace(/[_\-.]|\mp4/g, '')}</div>
+              <div class="list-group-item-description">${video.size}</div>
+            </a>
+          `;
+
+              listItem.addEventListener('click', function() {
+                window.open(`/tv.html#${video.name}`, '_blank');
+              });
+
+              listGroup.appendChild(listItem);
+            });
+          } else {
+            console.log('Data tidak ditemukan');
+            window.location.href = '../';
+          }
+        };
+
+        getRequest.onerror = function(event) {
+          console.log("Error: ", event.target.error);
+        };
+      };
+    }
+
+    function getRandomItems(array, count) {
+      const shuffled = array.sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+  </script>
+</body>
+
+</html>
